@@ -63,29 +63,31 @@ typedef struct VP8EncoderContext {
     int arnr_strength;
     int arnr_type;
     int lag_in_frames;
+    int max_intra_rate;
     int error_resilient;
     int crf;
 } VP8Context;
 
 /** String mappings for enum vp8e_enc_control_id */
 static const char *const ctlidstr[] = {
-    [VP8E_UPD_ENTROPY]           = "VP8E_UPD_ENTROPY",
-    [VP8E_UPD_REFERENCE]         = "VP8E_UPD_REFERENCE",
-    [VP8E_USE_REFERENCE]         = "VP8E_USE_REFERENCE",
-    [VP8E_SET_ROI_MAP]           = "VP8E_SET_ROI_MAP",
-    [VP8E_SET_ACTIVEMAP]         = "VP8E_SET_ACTIVEMAP",
-    [VP8E_SET_SCALEMODE]         = "VP8E_SET_SCALEMODE",
-    [VP8E_SET_CPUUSED]           = "VP8E_SET_CPUUSED",
-    [VP8E_SET_ENABLEAUTOALTREF]  = "VP8E_SET_ENABLEAUTOALTREF",
-    [VP8E_SET_NOISE_SENSITIVITY] = "VP8E_SET_NOISE_SENSITIVITY",
-    [VP8E_SET_SHARPNESS]         = "VP8E_SET_SHARPNESS",
-    [VP8E_SET_STATIC_THRESHOLD]  = "VP8E_SET_STATIC_THRESHOLD",
-    [VP8E_SET_TOKEN_PARTITIONS]  = "VP8E_SET_TOKEN_PARTITIONS",
-    [VP8E_GET_LAST_QUANTIZER]    = "VP8E_GET_LAST_QUANTIZER",
-    [VP8E_SET_ARNR_MAXFRAMES]    = "VP8E_SET_ARNR_MAXFRAMES",
-    [VP8E_SET_ARNR_STRENGTH]     = "VP8E_SET_ARNR_STRENGTH",
-    [VP8E_SET_ARNR_TYPE]         = "VP8E_SET_ARNR_TYPE",
-    [VP8E_SET_CQ_LEVEL]          = "VP8E_SET_CQ_LEVEL",
+    [VP8E_UPD_ENTROPY]               = "VP8E_UPD_ENTROPY",
+    [VP8E_UPD_REFERENCE]             = "VP8E_UPD_REFERENCE",
+    [VP8E_USE_REFERENCE]             = "VP8E_USE_REFERENCE",
+    [VP8E_SET_ROI_MAP]               = "VP8E_SET_ROI_MAP",
+    [VP8E_SET_ACTIVEMAP]             = "VP8E_SET_ACTIVEMAP",
+    [VP8E_SET_SCALEMODE]             = "VP8E_SET_SCALEMODE",
+    [VP8E_SET_CPUUSED]               = "VP8E_SET_CPUUSED",
+    [VP8E_SET_ENABLEAUTOALTREF]      = "VP8E_SET_ENABLEAUTOALTREF",
+    [VP8E_SET_NOISE_SENSITIVITY]     = "VP8E_SET_NOISE_SENSITIVITY",
+    [VP8E_SET_SHARPNESS]             = "VP8E_SET_SHARPNESS",
+    [VP8E_SET_STATIC_THRESHOLD]      = "VP8E_SET_STATIC_THRESHOLD",
+    [VP8E_SET_TOKEN_PARTITIONS]      = "VP8E_SET_TOKEN_PARTITIONS",
+    [VP8E_GET_LAST_QUANTIZER]        = "VP8E_GET_LAST_QUANTIZER",
+    [VP8E_SET_ARNR_MAXFRAMES]        = "VP8E_SET_ARNR_MAXFRAMES",
+    [VP8E_SET_ARNR_STRENGTH]         = "VP8E_SET_ARNR_STRENGTH",
+    [VP8E_SET_ARNR_TYPE]             = "VP8E_SET_ARNR_TYPE",
+    [VP8E_SET_CQ_LEVEL]              = "VP8E_SET_CQ_LEVEL",
+    [VP8E_SET_MAX_INTRA_BITRATE_PCT] = "VP8E_SET_MAX_INTRA_BITRATE_PCT"
 };
 
 static av_cold void log_encoder_error(AVCodecContext *avctx, const char *desc)
@@ -344,6 +346,9 @@ static av_cold int vpx_init(AVCodecContext *avctx,
         codecctl_int(avctx, VP8E_SET_ARNR_STRENGTH,    ctx->arnr_strength);
     if (ctx->arnr_type >= 0)
         codecctl_int(avctx, VP8E_SET_ARNR_TYPE,        ctx->arnr_type);
+    if (ctx->max_intra_rate >= 0)
+        codecctl_int(avctx, VP8E_SET_MAX_INTRA_BITRATE_PCT,
+                     ctx->max_intra_rate);
     codecctl_int(avctx, VP8E_SET_NOISE_SENSITIVITY, avctx->noise_reduction);
     codecctl_int(avctx, VP8E_SET_TOKEN_PARTITIONS,  av_log2(avctx->slices));
     codecctl_int(avctx, VP8E_SET_STATIC_THRESHOLD,  avctx->mb_threshold);
@@ -543,6 +548,7 @@ static const AVOption options[] = {
                          "frames (2-pass only)",                   OFFSET(auto_alt_ref),    AV_OPT_TYPE_INT, {.i64 = -1},      -1,      1,       VE},
     { "lag-in-frames",   "Number of frames to look ahead for "
                          "alternate reference frame selection",    OFFSET(lag_in_frames),   AV_OPT_TYPE_INT, {.i64 = -1},      -1,      INT_MAX, VE},
+    { "max-intra-rate",  "Maximum I-frame bitrate",                OFFSET(max_intra_rate),  AV_OPT_TYPE_INT, {.i64 = -1},      -1,      INT_MAX, VE},
     { "arnr-maxframes",  "altref noise reduction max frame count", OFFSET(arnr_max_frames), AV_OPT_TYPE_INT, {.i64 = -1},      -1,      INT_MAX, VE},
     { "arnr-strength",   "altref noise reduction filter strength", OFFSET(arnr_strength),   AV_OPT_TYPE_INT, {.i64 = -1},      -1,      INT_MAX, VE},
     { "arnr-type",       "altref noise reduction filter type",     OFFSET(arnr_type),       AV_OPT_TYPE_INT, {.i64 = -1},      -1,      INT_MAX, VE, "arnr_type"},
