@@ -356,7 +356,7 @@ typedef struct AVFrame {
 
     enum AVChromaLocation chroma_location;
 
-    AVPixelFormaton *formaton;
+    AVPixelFormatonRef *formaton;
 } AVFrame;
 
 /**
