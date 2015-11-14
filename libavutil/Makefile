@@ -21,7 +21,6 @@ HEADERS = adler32.h                                                     \
           eval.h                                                        \
           fifo.h                                                        \
           file.h                                                        \
-          formaton.h                                                    \
           frame.h                                                       \
           hmac.h                                                        \
           imgutils.h                                                    \
@@ -38,6 +37,7 @@ HEADERS = adler32.h                                                     \
           parseutils.h                                                  \
           pixdesc.h                                                     \
           pixfmt.h                                                      \
+          pixformaton.h                                                 \
           random_seed.h                                                 \
           replaygain.h                                                  \
           rational.h                                                    \
@@ -77,7 +77,6 @@ OBJS = adler32.o                                                        \
        file.o                                                           \
        file_open.o                                                      \
        float_dsp.o                                                      \
-       formaton.o                                                       \
        frame.o                                                          \
        hmac.o                                                           \
        imgutils.o                                                       \
@@ -93,6 +92,7 @@ OBJS = adler32.o                                                        \
        opt.o                                                            \
        parseutils.o                                                     \
        pixdesc.o                                                        \
+       pixformaton.o                                                    \
        random_seed.o                                                    \
        rational.o                                                       \
        rc4.o                                                            \
