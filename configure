@@ -344,7 +344,7 @@ log(){
 log_file(){
     log BEGIN $1
     i=1
-    while read line; do
+    while read line;do
         printf '%5s   %s\n' "${i}" "${line}"
         i=$(($i+1))
     done < $1 >> $logfile
@@ -2567,7 +2567,7 @@ die_unknown(){
 }
 
 print_3_columns() {
-    printf "%-25s %-25s %-25s\n" $(cat | tr ' ' '\n' | sort)
+    printf "%-20s %-20s %-20s\n" $(cat | tr ' ' '\n' | sort)
 }
 
 show_list() {
