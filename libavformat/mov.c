@@ -1440,7 +1440,11 @@ static int mov_finalize_stsd_codec(MOVContext *c, AVIOContext *pb,
     switch (st->codec->codec_id) {
 #if CONFIG_DV_DEMUXER
     case AV_CODEC_ID_DVAUDIO:
-        c->dv_fctx  = avformat_alloc_context();
+        c->dv_fctx = avformat_alloc_context();
+        if (!c->dv_fctx) {
+            av_log(c->fc, AV_LOG_ERROR, "dv demux context alloc error\n");
+            return AVERROR(ENOMEM);
+        }
         c->dv_demux = avpriv_dv_init_demux(c->dv_fctx);
         if (!c->dv_demux) {
             av_log(c->fc, AV_LOG_ERROR, "dv demux context init error\n");
@@ -1790,10 +1794,11 @@ static int mov_read_stsz(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
     sc->sample_count = i;
 
+    av_free(buf);
+
     if (pb->eof_reached)
         return AVERROR_EOF;
 
-    av_free(buf);
     return 0;
 }
 
@@ -1876,11 +1881,13 @@ static int mov_read_ctts(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
     av_dlog(c->fc, "track[%i].ctts.entries = %i\n", c->fc->nb_streams-1, entries);
 
+    av_freep(&sc->ctts_data);
+
     if (!entries)
         return 0;
     if (entries >= UINT_MAX / sizeof(*sc->ctts_data))
         return AVERROR_INVALIDDATA;
-    sc->ctts_data = av_malloc(entries * sizeof(*sc->ctts_data));
+    sc->ctts_data = av_realloc(NULL, entries * sizeof(*sc->ctts_data));
     if (!sc->ctts_data)
         return AVERROR(ENOMEM);
 
